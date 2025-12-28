@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import asyncio
-from States import state
+from states.States import state
 
 
 class BaseAgent(ABC):
