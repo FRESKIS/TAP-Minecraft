@@ -2,7 +2,7 @@ import json
 import re
 from datetime import datetime, timezone
 
-class JSONMessageHandler:
+class JSONMessageHandeler:
     _ISO_8601_UTC_Z = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
     _ALLOWED_STATUS = {"SUCCESS", "ERROR", "PENDING"}
 
@@ -27,7 +27,7 @@ class JSONMessageHandler:
             raise ValueError("target must be a non-empty string")
 
         ts = msg["timestamp"]
-        if not isinstance(ts, str) or not JSONMessageHandler.ISO_8601_UTC_Z.match(ts):
+        if not isinstance(ts, str) or not JSONMessageHandeler.ISO_8601_UTC_Z.match(ts):
             raise ValueError("timestamp must be ISO8601 UTC: YYYY-MM-DDTHH:MM:SSZ")
 
         # valida que la fecha exista (no 2025-99-99...)
@@ -36,8 +36,8 @@ class JSONMessageHandler:
         if not isinstance(msg["payload"], dict):
             raise ValueError("payload must be a dict/object")
 
-        if msg["status"] not in JSONMessageHandler.ALLOWED_STATUS:
-            raise ValueError(f"status must be one of {JSONMessageHandler.ALLOWED_STATUS}")
+        if msg["status"] not in JSONMessageHandeler.ALLOWED_STATUS:
+            raise ValueError(f"status must be one of {JSONMessageHandeler.ALLOWED_STATUS}")
 
         if "context" in msg and msg["context"] is not None and not isinstance(msg["context"], dict):
             raise ValueError("context must be a dict if present")
@@ -50,18 +50,18 @@ class JSONMessageHandler:
             "type": msg_type,
             "source": source,
             "target": target,
-            "timestamp": timestamp or JSONMessageHandler.now_utc_z(),
+            "timestamp": timestamp or JSONMessageHandeler.now_utc_z(),
             "payload": payload,
             "status": status,
         }
         if context is not None:
             msg["context"] = context
 
-        JSONMessageHandler.validate(msg)
+        JSONMessageHandeler.validate(msg)
         return json.dumps(msg)
 
     @staticmethod
     def from_json(json_str: str) -> dict:
         msg = json.loads(json_str)
-        JSONMessageHandler.validate(msg)
+        JSONMessageHandeler.validate(msg)
         return msg
