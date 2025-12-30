@@ -1,13 +1,13 @@
 from mcpi.minecraft import Minecraft
 from mcpi import block
-from builds import *
-import json
+from constructor import constructor
+
 
 
 mc = Minecraft.create()
 pos = mc.player.getTilePos()
 
 
-b = building(garden)
-b.construct(mc, pos)
-print(b.properties())
+b = constructor()
+
+b.build(mc, pos, "house")

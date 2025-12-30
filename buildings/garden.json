@@ -1,0 +1,35 @@
+{
+  "name": "garden",
+
+  "dimensions": {
+    "length": 3,
+    "width": 3,
+    "height": 2
+  },
+
+  "Nblocks": 16,
+
+  "legend": {
+    "G": "GRASS",
+    "F": "FLOWER_CYAN",
+    ".": "AIR"
+  },
+
+  "materials": {
+    "GRASS": 9,
+    "FLOWER_CYAN": 7
+  },
+
+  "structure": [
+    [
+      "GGG",
+      "GGG",
+      "GGG"
+    ],
+    [
+      "F.F",
+      "F.F",
+      "FFF"
+    ]
+  ]
+}

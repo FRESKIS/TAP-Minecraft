@@ -1,0 +1,60 @@
+{
+  "name": "house",
+
+  "dimensions": {
+    "length": 5,
+    "width": 5,
+    "height": 5
+  },
+
+  "Nblocks": 98,
+
+  "legend": {
+    "W": "WOOD",
+    "B": "BRICK_BLOCK",
+    ".": "AIR"
+  },
+
+  "materials": {
+    "WOOD": 62,
+    "BRICK_BLOCK": 36
+  },
+
+  "structure": [
+    [
+      "WWWWW",
+      "WWWWW",
+      "WWWWW",
+      "WWWWW",
+      "WWWWW"
+    ],
+    [
+      "WBBBW",
+      "B...B",
+      "B...B",
+      "B...B",
+      "WBBBW"
+    ],
+    [
+      "WBBBW",
+      "B...B",
+      "B...B",
+      "B...B",
+      "WBBBW"
+    ],
+    [
+      "WBBBW",
+      "B...B",
+      "B...B",
+      "B...B",
+      "WBBBW"
+    ],
+    [
+      "WWWWW",
+      "WWWWW",
+      "WWWWW",
+      "WWWWW",
+      "WWWWW"
+    ]
+  ]
+}
