@@ -1,15 +1,15 @@
-def parse_message(msg: str):
+def parse_message(msg: str) -> dict | str:
     msg: str = msg.strip()
-
-    # solo comandos que empiecen por !
-    if not msg.startswith("!"):
-        return None
 
     parts = msg[1:].split()   # quitamos el !
     if not parts:
-        return None
+        return "Nai"
 
     agent = parts[0].lower()
+    if agent not in ["builder", "miner", "explorer"]:
+        return "Agent not found"
+    if len(parts) < 2:
+        return "No command provided"
     command = parts[1]
     args = parts[2:]
 
