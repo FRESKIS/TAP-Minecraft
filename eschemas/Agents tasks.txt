@@ -1,0 +1,66 @@
+BuilderBot:
+1. Recibir y procesar mapas de ExplorerBot
+    * consumir map.v1
+2. Gestionar planes de construccion
+    * mantener una planlist
+    * permitir actualizaciones dinamicas
+3. Generar el BOM 
+    * calcular los materiales necesarios respecto a las estructuras guardadas en planlist
+    * usar constructor.get_requirements
+    * publicar materials.requirements.v1
+4. Esperar ,ateriales cuando no estan disponibles
+    * WAITING
+    * reanudar automaticamente al recibir inventory.v1
+5. Construir la estructura
+    * usar la funcion constructor.build
+    * registrar coordenadas y materiales  
+    * emitir actualizaciones constantes del progreso con build.v1
+6. Reaccionar a cambios en el plan 
+    * si se detecta un cambio
+        * detener la construccion
+        * recalcular la BOM
+        * volver a coordinar a MinerBot
+7. Gestionar comandos de estado
+    * build, pause, resume, IDDLE, RUNNING...
+    * Mantener el contexto al pausar 
+
+MinerBot
+1. Recibir BOM 
+    * recibir el BOM del builder bot con materials.requirements.v1
+    * validar si se posen estos materiales en el inventario
+2. Gestionar el inventario
+    * llevar un registro interno de materiales disponibles
+    * decidir si se tiene que minar o si se puede responder directamente
+3. Ejecutar estrategia de mineria
+    * implementacion de diversas estrategias de mineria
+    * uso de design pattern strategie
+4. publicar progreso de mineria
+    * enviar mensajes a inventory.v1
+    * materiales obtenidos, progreso parcial, estado
+5. Bloquear regiones de mineria
+    * evitar regiones locked por el explorer bot
+    liberar blocks al parar o fallar
+6. Gestionar comandos y estados
+    * start, resume, pause, IDDLE, RUNNING...
+    * Mantener el contexto al pausar.
+
+
+
+ExplorerBot
+1. Explorar el terreno
+    * Escanear el mundo con getHight(x, z)
+    * Analizar variaciones de altura para detectar terrenos planos
+2. Identificar zonas aptas para la construccion
+    * Detectar variaciones con minima variacion de elevacion
+    * señalar obstaculos o irregularidades relevantes
+3. Publicar informacion del mapa
+    * publicar map.v1 
+    * zona de construccion -> BuilderBot
+    * zona bloqueada -> ExplorerBot
+4. Gestionar comandos del usuario
+    * start, stop, resume...
+    * al recibir nuevas ordenes, decidir si encolar o interrumpir
+5. Gestionar el estado y el contexto
+    * start, resume, pause, IDDLE, RUNNING...
+    * Mantener el contexto al pausar.
+

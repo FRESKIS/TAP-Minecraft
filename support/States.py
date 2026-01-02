@@ -5,3 +5,4 @@ class state(enumerate):
     WAITING = "WAITING"
     STOPPED = "STOPPED"
     ERROR = "ERROR"
+
