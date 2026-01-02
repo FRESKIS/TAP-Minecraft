@@ -1,3 +1,7 @@
+from abc import ABC
+from textwrap import dedent
+
+
 def parse_message(msg: str) -> dict | str:
     msg: str = msg.strip()
 
@@ -20,33 +24,34 @@ def parse_message(msg: str) -> dict | str:
     }
 
 
-class builder:
-    @staticmethod
-    def help():
-        print("Available commands:")
-        print("!builder plan list")
-        print("!builder plan set < template > [ params ]")
-        print("!builder bom")
-        print("!builder build")
-        print("!builder pause")
-        print("!builder resume")
+class BuilderCommand(ABC):
+    async def help(self):
+        msg = dedent("""\
+        Available commands:
+        !builder plan list
+        !builder plan set <template> [params]
+        !builder bom
+        !builder build
+        !builder pause
+        !builder resume
+        """)
+        await self.answer_to_chat(msg)
 
-    @staticmethod
-    def planlist():
-        pass
+    async def planlist(self):
+        await self.answer_to_chat(f"Current plan list:\n" + "\n".join(f"- {x}" for x in self.plan_list))
 
-class miner:
-    @staticmethod
-    def help():
-        print("Available commands:")
-        print("!miner mine < area >")
-        print("!miner pause")
-        print("!miner resume")
+class MinerCommand(ABC):
+    async def help(self):
+        msg = f"""Available commands:
+        !miner dig < area >
+        !miner pause
+        """
+        await self.answer_to_chat(msg)
 
-class explorer:
-    @staticmethod
-    def help():
-        print("Available commands:")
-        print("!explorer explore < area >")
-        print("!explorer pause")
-        print("!explorer resume")
+class ExplorerCommand(ABC):
+    async def help(self):
+        msg = f"""Available commands:
+        !explorer explore < area >
+        !explorer pause
+        """
+        await self.answer_to_chat(msg)

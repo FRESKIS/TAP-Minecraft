@@ -1,8 +1,9 @@
+import asyncio
+import inspect
 from mcpi.minecraft import Minecraft
 from mcpi import block
 from buildings.constructor import constructor
-from commands import commands
-from commands.commands import parse_message, builder
+from commands.commands import parse_message
 from agents.BaseAgent import BaseAgent
 from support import registry
 
@@ -11,9 +12,9 @@ discovered_agents = registry.discover_agents()
 mc = Minecraft.create()
 pos = mc.player.getTilePos()
 
-builder_bot = discovered_agents["BuilderBot"]("builder", None)
-miner_bot = discovered_agents["MinerBot"]("miner", None)
-explorer_bot = discovered_agents["ExplorerBot"]("explorer", None)
+builder_bot = discovered_agents["BuilderBot"]("builder", None, mc)
+miner_bot = discovered_agents["MinerBot"]("miner", None, mc)
+explorer_bot = discovered_agents["ExplorerBot"]("explorer", None, mc)
 
 agents : dict[str, BaseAgent] = {
     "builder": builder_bot
@@ -21,16 +22,23 @@ agents : dict[str, BaseAgent] = {
     ,"explorer": explorer_bot
 }
 
-while True:
-    chatEvents = mc.events.pollChatPosts()
-    if chatEvents:
-        for chatEvent in chatEvents:
-            if chatEvent.message.startswith("!"):
-                msg = parse_message(chatEvent.message)
-                if type(msg) != str and msg["command"] in dir(agents[msg["agent"]]):
-                    if not msg["args"]:
-                        getattr(agents[msg["agent"]], msg["command"])()
+async def main():
+    while True:
+        chatEvents = mc.events.pollChatPosts()
+        if chatEvents:
+            for chatEvent in chatEvents:
+                if chatEvent.message.startswith("!"):
+                    msg = parse_message(chatEvent.message)
+                    if isinstance(msg, dict):
+                        if msg["command"] in dir(agents[msg["agent"]]):
+                            if not msg["args"]:
+                                await getattr(agents[msg["agent"]], msg["command"])()
+                            else:
+                                await getattr(agents[msg["agent"]], msg["command"])(", ".join(msg["args"]))
+                        else:
+                            mc.postToChat(f"//Command '{msg['command']}' not found for agent '{msg['agent']}'")
                     else:
-                        getattr(agents[msg["agent"]], msg["command"])(", ".join(msg["args"]))
-                else:
-                    print(msg)
+                        mc.postToChat("//" + str(msg))
+
+if __name__ == "__main__":
+    asyncio.run(main())

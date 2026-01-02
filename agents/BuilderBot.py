@@ -1,18 +1,18 @@
 from agents.BaseAgent import BaseAgent 
-from commands.commands import builder
+from buildings.constructor import constructor
+from commands.commands import BuilderCommand
 
-class BuilderBot(BaseAgent, builder):
-    planlist : str = []
+class BuilderBot(BaseAgent, BuilderCommand):
+    plan_list : list = []
     bom : dict = {}
 
-    def __init__(self, agent_id, bus):
-        BaseAgent.__init__(self, agent_id, bus)
+    def __init__(self, agent_id, bus, mc):
+        BaseAgent.__init__(self, agent_id, bus, mc)
 
-
-    def decide(self):
+    async def perceive(self):
         pass
 
-    def perceive(self):
+    async def decide(self):
         pass
 
     async def act(self):

@@ -1,12 +1,12 @@
 from agents.BaseAgent import BaseAgent 
-from commands.commands import miner
+from commands.commands import MinerCommand
 
-class MinerBot(BaseAgent, miner):
+class MinerBot(BaseAgent, MinerCommand):
     planlist : str = []
     bom : dict = {}
 
-    def __init__(self, agent_id, bus):
-        BaseAgent.__init__(self, agent_id, bus)
+    def __init__(self, agent_id, bus, mc):
+        BaseAgent.__init__(self, agent_id, bus, mc)
 
 
     def decide(self):
