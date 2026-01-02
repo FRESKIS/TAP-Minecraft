@@ -38,7 +38,7 @@ class BuilderCommand(ABC):
         await self.answer_to_chat(msg)
 
     async def planlist(self):
-        await self.answer_to_chat(f"Current plan list:\n" + "\n".join(f"- {x}" for x in self.plan_list))
+        await self.answer_to_chat(f"Current plan list:\n" + "\n".join(f"- {plan["name"]}" for plan in self.plan_list))
 
 class MinerCommand(ABC):
     async def help(self):
