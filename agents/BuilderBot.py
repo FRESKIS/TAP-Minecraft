@@ -3,7 +3,7 @@ from buildings.constructor import constructor
 from commands.commands import BuilderCommand
 
 class BuilderBot(BaseAgent, BuilderCommand):
-    plan_list : dict = {}
+    plan_list : list[dict] = []
 
     def __init__(self, agent_id, bus, mc):
         BaseAgent.__init__(self, agent_id, bus, mc)
@@ -15,8 +15,14 @@ class BuilderBot(BaseAgent, BuilderCommand):
         pass
 
     async def act(self):
-        # Implementation of the BuilderBot's actions
-        pass
+        if not self.plan_list:
+            await self.answer_to_chat("No plans to build.")
+            return
+        else:    
+            constructor.build(self.mc, self.mc.player.getTilePos(), self.plan_list[0]["name"])
+            self.plan_list.pop(0)
+            # Implementation of the BuilderBot's actions
+            pass
 
     async def save_context(self):
         # Implementation of context saving for BuilderBot

@@ -8,11 +8,10 @@ class MinerBot(BaseAgent, MinerCommand):
     def __init__(self, agent_id, bus, mc):
         BaseAgent.__init__(self, agent_id, bus, mc)
 
-
-    def decide(self):
+    async def perceive(self):
         pass
 
-    def perceive(self):
+    async def decide(self):
         pass
 
     async def act(self):

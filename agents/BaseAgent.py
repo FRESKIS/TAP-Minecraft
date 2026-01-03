@@ -30,24 +30,14 @@ class BaseAgent(ABC):
 
     async def run(self):
         self.state = state.RUNNING
-        while self.state not in {state.STOPPED, state.ERROR}:
-            # Wait if the agent is paused, waiting, or idle
-            if self.state in {state.PAUSED, state.WAITING, state.IDLE}:
-                await asyncio.sleep(0.1)
-                continue
+         
+        await self.perceive()
 
-            if self.state != state.RUNNING:         #If it changed state during perceive, skip to next loop
-                continue            
-            await self.perceive()
-            if self.state != state.RUNNING:         #If it changed state during perceive, skip to next loop
-                continue
-            await self.decide()
-            if self.state != state.RUNNING:         #If it changed state during decide, skip to next loop    
-                continue
-            await self.act()
-            if self.state != state.RUNNING:
-                continue
-            await asyncio.sleep(0.1)                # Small delay to prevent async tight loop
+        await self.decide()
+
+        await self.act()
+
+        await asyncio.sleep(0.1)                # Small delay to prevent async tight loop
 
     async def answer_to_chat(self, message):
         for x in message.splitlines():
