@@ -3,6 +3,7 @@ from buildings.constructor import constructor
 from commands.commands import BuilderCommand
 
 class BuilderBot(BaseAgent, BuilderCommand):
+    context : dict = {}
     plan_list : list[dict] = []
 
     def __init__(self, agent_id, bus, mc):

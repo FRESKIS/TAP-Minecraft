@@ -3,18 +3,19 @@ import inspect
 from mcpi.minecraft import Minecraft
 from mcpi import block
 from buildings.constructor import constructor
-from commands.commands import parse_message
+from support.commands import parse_message, dispatch_command
 from agents.BaseAgent import BaseAgent
 from support import registry
+from support.MessageBus import MessageBus
 
 discovered_agents = registry.discover_agents()
-
+bus = MessageBus()
 mc = Minecraft.create()
 pos = mc.player.getTilePos()
 
-builder_bot = discovered_agents["BuilderBot"]("builder", None, mc)
-miner_bot = discovered_agents["MinerBot"]("miner", None, mc)
-explorer_bot = discovered_agents["ExplorerBot"]("explorer", None, mc)
+builder_bot = discovered_agents["BuilderBot"]("builder", bus, mc)
+miner_bot = discovered_agents["MinerBot"]("miner", bus, mc)
+explorer_bot = discovered_agents["ExplorerBot"]("explorer", bus, mc)
 
 agents : dict[str, BaseAgent] = {
     "builder": builder_bot
@@ -22,17 +23,6 @@ agents : dict[str, BaseAgent] = {
     ,"explorer": explorer_bot
 }
 
-async def dispatch_command(agent, command: str, args: list[str]):
-    fn = getattr(agent, command)
-    if args:
-        res = fn(", ".join(args))
-    else:
-        res = fn()
-
-    if inspect.isawaitable(res):
-        await res
-    else:
-        res
 
 async def main():
     while True:
@@ -43,7 +33,7 @@ async def main():
                     msg = parse_message(chatEvent.message)
                     if isinstance(msg, dict):
                         if msg["command"] in dir(agents[msg["agent"]]):
-                            asyncio.create_task(dispatch_command(msg["agent"], msg["command"], msg["args"]))
+                            asyncio.create_task(dispatch_command(agents[msg["agent"]], msg["command"], msg["args"]))
                         else:
                             mc.postToChat(f"//Command '{msg['command']}' not found for agent '{msg['agent']}'")
                     else:

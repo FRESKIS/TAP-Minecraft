@@ -1,4 +1,5 @@
 import json
+import asyncio
 from pathlib import Path
 from support.block_resolver import resolve_block_id
 from time import sleep
@@ -20,11 +21,11 @@ class constructor:
         return requirement
     
     @staticmethod
-    def build(mc, pos, json_path: str | Path):
+    async def build(mc, pos, json_path: str | Path):
         data = constructor.load(json_path)
 
         legend_ids = {
-            sym: resolve_block_id(block_name)
+            sym: await resolve_block_id(block_name)
             for sym, block_name in data["legend"].items()
         }
 
@@ -32,4 +33,4 @@ class constructor:
             for x, row in enumerate(layer):
                 for z, sym in enumerate(row):
                     mc.setBlock(pos.x + x, pos.y + y, pos.z + z, legend_ids[sym])
-            sleep(1)  # Pequeña pausa para visualizar la construcción capa por capa
+            await asyncio.sleep(1)  # Pequeña pausa para visualizar la construcción capa por capa

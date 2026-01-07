@@ -3,15 +3,18 @@ from agents.BaseAgent import BaseAgent
 from commands.commands import ExplorerCommand
 from mcpi import block
 from support.States import state
+from support.JSONMessageHandeler import JSONMessageHandeler
 import uuid
 
 class ExplorerBot(BaseAgent, ExplorerCommand):
-    context : list[dict] = [{"expedition_id": "", "explored_area": [{"x": int, "z": int, "area": int}], "height_maps": [], "state": str, "progress": {"x": int, "z": int}}]
+    context : dict = [{"expedition_id": "", "explored_area": [{"x": int, "z": int, "area": int}], "height_maps": [], "state": str, "progress": {"x": int, "z": int}}]
+    tasks : list[dict] = []
 
     def __init__(self, agent_id, bus, mc):
         BaseAgent.__init__(self, agent_id, bus, mc)
         self.stop = asyncio.Event()
-        self.wait = asyncio.Event().set()
+        self.wait = asyncio.Event()
+        self.wait.set()
 
     async def perceive(self):
         pass
@@ -29,28 +32,30 @@ class ExplorerBot(BaseAgent, ExplorerCommand):
 
     async def explore_area(self, x, z, area_size: int) -> list[list[dict]]:
         higth_map : list[list[dict]] = []
-        expedition_id = str(uuid.uuid4())
         i = x
         j = z
         while i < x + area_size and not self.stop.is_set():
             while j < z + area_size and not self.stop.is_set():
-                self.wait.wait()
-                await higth_map[i][j] = {"x": x + i, "z": j + z, "height": self.mc.getHeight(x + i, z + j)}
-                await self.mc.setBlock(i, higth_map[i][j]["height"], j, block.SAPLING.id)  # Place glass block at the height
+                await self.wait.wait()
+                higth_map[i][j] = {"x": x + i, "z": j + z, "height": self.mc.getHeight(x + i, z + j)}
+                self.mc.setBlock(i, higth_map[i][j]["height"], j, block.SAPLING.id)  # Place glass block at the height
                 j += 1
             i += 1
-        if not self.stop.is_set():
-            await self.context.append({"expedition_id": expedition_id, "explored_area": [{"x": x, "z": z, "area": area_size}], "height_maps": higth_map, "state": "COMPLETED"})
-            return higth_map
-        else:
-            await self.safe_exploration(expedition_id, i, j)
+        return higth_map
+
     
     async def safe_exploration(self, expedition, i, j):
-        for k in self.context:
-            if k["expedition_id"] == expedition:
-                k["state"] = "PAUSED"
-                k["progress"] = {"x": i, "z": j}
+        if self.context["expedition_id"] == expedition:
+            self.context["state"] = "PAUSED"
+            self.context["progress"] = {"x": i, "z": j}
         self.state = state.IDLE
 
+    async def response(self):
+        msg = JSONMessageHandeler.from_json(self.queue)
+        if msg["type"] == "build.v1":
+            pass
+        if msg["type"] == "buildingspace.v1":
+            exp_id = str(uuid.uuid4()) 
+            self.tasks.append({"exploration_id":exp_id, "eplore_area":{"x":msg["payload"]["lenght"], "z":msg["payload"]["width"], "area":msg["payload"]["area"]}})
         
         

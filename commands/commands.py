@@ -4,28 +4,6 @@ from support.States import state
 from buildings.constructor import constructor
 
 
-def parse_message(msg: str) -> dict | str:
-    msg: str = msg.strip()
-
-    parts = msg[1:].split()   # quitamos el !
-    if not parts:
-        return "Nai"
-
-    agent = parts[0].lower()
-    if agent not in ["builder", "miner", "explorer"]:
-        return "Agent not found"
-    if len(parts) < 2:
-        return "No command provided"
-    command = parts[1]
-    args = parts[2:]
-
-    return {
-        "agent": agent,
-        "command": command,
-        "args": args
-    }
-
-
 class BuilderCommand(ABC):
     async def help(self):
         msg = dedent("""\
@@ -36,6 +14,7 @@ class BuilderCommand(ABC):
         !builder build
         !builder pause
         !builder resume
+        !builder stop
         """)
         await self.answer_to_chat(msg)
 
@@ -48,25 +27,44 @@ class BuilderCommand(ABC):
         self.plan_list.append(params)
         await self.answer_to_chat(f"Plan '{template}' added to the plan list.")
 
-    async def start(self):
-        if self.state is not state.IDLE:
-            await self.run()
+
 
 class MinerCommand(ABC):
     async def help(self):
         msg = f"""Available commands:
-        !miner dig < area >
+        !miner start [ x = < int > z = < int > y = < int >]
+        !miner set strategy < vertical | grid | vein >
+        !miner fulfill
         !miner pause
+        !miner resume
+        !miner status
+        !miner stop
         """
         await self.answer_to_chat(msg)
+
+    async def start(self):
+        if self.state == state.IDLE:
+            await self.run()
+        else:
+            self.amswer_to_chat(f"Miner is already running")
 
 class ExplorerCommand(ABC):
     async def help(self):
         msg = f"""Available commands:
-        !explorer explore < area >
+        !explorer start x =< int > z = < int > [ range = < int >]
+        !explorer stop
+        !explorer set range <int >
+        !explorer status
         !explorer pause
+        !explorer resume
         """
         await self.answer_to_chat(msg)
+
+    async def start(self, x, z, range):
+        if self.state == state.IDLE:
+            await self.run()
+        else:
+            self.amswer_to_chat(f"Miner is already running")
 
     async def stop(self):
         self.stop.set()
