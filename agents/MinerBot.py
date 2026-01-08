@@ -1,6 +1,7 @@
 from agents.BaseAgent import BaseAgent
 from commands.commands import MinerCommand
 from support.States import state
+from support.strategies import vertical, Layer
 import json
 from support.JSONMessageHandeler import JSONMessageHandeler
 
@@ -8,6 +9,7 @@ class MinerBot(BaseAgent, MinerCommand):
     context : dict = {}
     plan_list: str = []
     bom: dict = {}
+    strategy = vertical
 
     def __init__(self, agent_id, bus : json, mc):
         BaseAgent.__init__(self, agent_id, bus, mc)

@@ -1,5 +1,4 @@
 import asyncio
-from agents.BaseAgent import BaseAgent
 import json
 
 class MessageBus:
@@ -7,7 +6,7 @@ class MessageBus:
         self.queues = {}
         self.suscribers = {}
 
-    def register_agent(self, agent : BaseAgent) -> asyncio.Queue:
+    def register_agent(self, agent) -> asyncio.Queue:
         """Registra un agente y crea una cola para él."""
         queue = asyncio.Queue()
         self.queues[agent.__class__.__name__] = queue

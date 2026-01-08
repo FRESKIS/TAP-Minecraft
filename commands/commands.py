@@ -1,4 +1,7 @@
 from abc import ABC
+import json
+import uuid
+from support.JSONMessageHandeler import JSONMessageHandeler
 from textwrap import dedent
 from support.States import state
 from buildings.constructor import constructor
@@ -27,6 +30,18 @@ class BuilderCommand(ABC):
         self.plan_list.append(params)
         await self.answer_to_chat(f"Plan '{template}' added to the plan list.")
 
+    async def build(self, template=None):
+        if self.state == state.IDLE:
+            await self.run()
+        elif template != None:
+            self.tasks.clear()
+            self.contecxt = {}
+            self.tasks.append(template)
+            await self.run()
+        else:
+            await self.amswer_to_chat(f"Builder is already running, task stored")
+
+
 
 
 class MinerCommand(ABC):
@@ -42,11 +57,18 @@ class MinerCommand(ABC):
         """
         await self.answer_to_chat(msg)
 
-    async def start(self):
-        if self.state == state.IDLE:
-            await self.run()
-        else:
-            self.amswer_to_chat(f"Miner is already running")
+    async def start(self, x, z, range, workflow=None):
+        if workflow != None:
+            self.tasks.append({})
+        else: 
+            if self.state == state.IDLE:
+                await self.run()
+            elif not self.bom:
+                self.tasks.clear()
+                self.contecxt = {}
+                self.tasks.append({})
+            else:
+                await self.amswer_to_chat(f"Explorer is already running, task stored")
 
 class ExplorerCommand(ABC):
     async def help(self):
@@ -60,11 +82,17 @@ class ExplorerCommand(ABC):
         """
         await self.answer_to_chat(msg)
 
-    async def start(self, x, z, range):
+    async def start(self, x, z, range, workflow=None):
+        exp_id = str(uuid.uuid4)
+        self.tasks.append({"": exp_id, "explored_area": [{"x": x, "z": z, "area": range}], "height_maps": [], "progress": {"x": 0, "z": 0}})
         if self.state == state.IDLE:
             await self.run()
+        elif workflow != None:
+            self.tasks.clear()
+            self.contecxt = {}
+            self.tasks.append({"expedition_id": exp_id, "explored_area": [{"x": x, "z": z, "area": range}], "height_maps": [], "progress": {"x": 0, "z": 0}})
         else:
-            self.amswer_to_chat(f"Miner is already running")
+            await self.amswer_to_chat(f"Explorer is already running, task stored")
 
     async def stop(self):
         self.stop.set()
@@ -77,3 +105,16 @@ class ExplorerCommand(ABC):
         else:
             self.wait.set()
             await self.answer_to_chat("Exploration paused.")
+
+
+class Workflow():
+    def __init__(self, builder, explorer, miner):
+        self.builder = builder
+        self.explorer = explorer
+        self.miner = miner 
+
+    async def run(self, lenght, width, range, template, strategy, minerx, minery, minerz):
+        self.explorer.start(lenght, width, range, 1)
+        self.builder.build(template)
+        self.miner.strategy = strategy
+        self.miner.start()

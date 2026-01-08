@@ -7,7 +7,10 @@ async def dispatch_command(agent, command: str, args: list[str]):
     else:
         res = fn()
     
-    asyncio.run(res)
+    if asyncio.isawaitable(res):
+        await res
+    else:
+        res
 
 
 def parse_message(msg: str) -> dict | str:

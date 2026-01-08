@@ -7,6 +7,7 @@ from support.commands import parse_message, dispatch_command
 from agents.BaseAgent import BaseAgent
 from support import registry
 from support.MessageBus import MessageBus
+from commands.commands import Workflow
 
 discovered_agents = registry.discover_agents()
 bus = MessageBus()
@@ -16,11 +17,13 @@ pos = mc.player.getTilePos()
 builder_bot = discovered_agents["BuilderBot"]("builder", bus, mc)
 miner_bot = discovered_agents["MinerBot"]("miner", bus, mc)
 explorer_bot = discovered_agents["ExplorerBot"]("explorer", bus, mc)
+workflow = Workflow(builder_bot, explorer_bot, miner_bot)
 
-agents : dict[str, BaseAgent] = {
+agents : dict = {
     "builder": builder_bot
     ,"miner": miner_bot
     ,"explorer": explorer_bot
+    ,"workflow": workflow
 }
 
 

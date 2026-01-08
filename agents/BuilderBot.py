@@ -4,7 +4,7 @@ from commands.commands import BuilderCommand
 
 class BuilderBot(BaseAgent, BuilderCommand):
     context : dict = {}
-    plan_list : list[dict] = []
+    plan_list : list = []
 
     def __init__(self, agent_id, bus, mc):
         BaseAgent.__init__(self, agent_id, bus, mc)
@@ -27,4 +27,7 @@ class BuilderBot(BaseAgent, BuilderCommand):
 
     async def save_context(self):
         # Implementation of context saving for BuilderBot
+        pass
+
+    async def response(self):
         pass

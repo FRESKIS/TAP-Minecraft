@@ -38,7 +38,7 @@ class ExplorerBot(BaseAgent, ExplorerCommand):
             while j < z + area_size and not self.stop.is_set():
                 await self.wait.wait()
                 higth_map[i][j] = {"x": x + i, "z": j + z, "height": self.mc.getHeight(x + i, z + j)}
-                self.mc.setBlock(i, higth_map[i][j]["height"], j, block.SAPLING.id)  # Place glass block at the height
+                self.mc.setBlock(i, higth_map[i][j]["height"] + 1, j, block.SAPLING.id)  # Place glass block at the height
                 j += 1
             i += 1
         return higth_map
